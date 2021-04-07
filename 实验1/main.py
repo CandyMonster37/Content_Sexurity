@@ -6,8 +6,7 @@ import random
 import os
 
 
-def tar_baidu(save=False, wait=True):
-    url = "http://top.baidu.com/category?c=1"
+def tar_baidu(url, save=False, wait=True):
     baidu = BaiDu(url)
     if len(baidu.html) == 0:
         print('error')
@@ -31,8 +30,7 @@ def tar_baidu(save=False, wait=True):
                     f.write(line+'\n')
 
 
-def tar_dang(save=False, wait=True):
-    url = 'http://bang.dangdang.com/books/fivestars/01.28.00.00.00.00-all-0-0-2-1'
+def tar_dang(url, save=False, wait=True):
     dang = Dang()
     for i in range(0, 25):
         page = i + 1
@@ -70,8 +68,10 @@ def main():
     """
     if not os.path.exists('/data/'):
         os.mkdir('data')
-    # tar_baidu(save=True, wait=True)
-    # tar_dang(save=True, wait=True)
+    url_baidu = "http://top.baidu.com/category?c=1"
+    tar_baidu(url=url_baidu, save=True, wait=True)
+    url_dang = 'http://bang.dangdang.com/books/fivestars/01.28.00.00.00.00-all-0-0-2-1'
+    tar_dang(url=url_dang, save=True, wait=True)
 
 
 if __name__ == '__main__':
