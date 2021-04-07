@@ -9,7 +9,7 @@ import os
 def tar_baidu(url, save=False, wait=True):
     baidu = BaiDu(url)
     if len(baidu.html) == 0:
-        print('error')
+        print('Error happened when getting data from BaiDu!')
         return
     for item in baidu.classes.keys():
         link = baidu.classes[item]
@@ -36,6 +36,9 @@ def tar_dang(url, save=False, wait=True):
         page = i + 1
         link = url
         dang.update(link, page)
+        if len(dang.html) == 0:
+            print('Error happened when getting data from DangDang!')
+            return
         dang.proc_1_page()
         if wait:
             stop = random.randint(3, 7)

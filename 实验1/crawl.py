@@ -85,7 +85,6 @@ class Dang:
         self.bs = BS(self.html, 'html.parser')
 
     def proc_1_page(self):
-
         # 书名
         book_pre = self.bs.select(self.book_path)
         split_ = r'.*(?=（)'  # 正先行断言去除括号内的简介
@@ -187,18 +186,13 @@ class BaiDu:
 
         hot = []
         hot_list = soup.find_all('td', 'last')
-        rule = r"\d*"
         for item in hot_list:
-            name = re.compile(rule).findall(str(item))
-            hots = -1
-            for i in name:
-                if len(i) == 0:
-                    continue
-                else:
-                    hots = i
-                    break
-            if hots == -1:
+            pre = item.text.strip()
+            # 以防没有结果，实际没啥卵用
+            if len(pre) == 0:
                 hots = 'None'
+            else:
+                hots = pre
             hot.append(hots)
 
         return title, movie, hot
