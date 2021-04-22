@@ -7,7 +7,7 @@ import torch
 
 
 def main():
-    if not os.path.exists('./data'):
+    if not os.path.exists('../data'):
         print('No source data file!')
         print("Need folder named 'data' unzipped from 'data.zip'!")
         return

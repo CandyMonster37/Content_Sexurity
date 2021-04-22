@@ -8,7 +8,7 @@ import re
 
 
 class TASK:
-    def __init__(self, root_path='./data'):
+    def __init__(self, root_path='../data'):
         self.allPOS = ('n', 'ns', 'v', 'vn')
         self.root_path = root_path
         self.class_list = os.listdir(self.root_path)
