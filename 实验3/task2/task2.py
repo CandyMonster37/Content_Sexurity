@@ -142,32 +142,46 @@ def measure(test_y, pre_y):
     return acc, recall, precision, f1
 
 
-def person_detect(file):
-    x = []
-    img = cv.imread(file, 0)
-    shape = img.shape
-    img_x = shape[0]
-    img_y = shape[1]
-    s_x = img_x / 28
-    s_y = img_y / 28
-    re_shape = cv.resize(img, None, fx=s_x, fy=s_y, interpolation=cv.INTER_CUBIC)
-
-    img_ = deskew(re_shape)  # 做图像校正
-    hog_ = hog(img_)
-    x.append(hog_)
-
-    clf_ = 'model.pkl'
-    if os.path.exists(clf_):
+def person_detect(file_path, bat=False):
+    if bat:
+        imgs = os.listdir(file_path)
+        x = []
+        clf_ = 'model.pkl'
         with open(clf_, 'rb') as f:
             clf = pickle.load(f)
-    pre_y = predict(test_x=x, clf=clf)
-    pre = id_2_label[pre_y]
-    print('预测结果为：', pre)
+
+        for file in imgs:
+            image = file_path + '/' + file
+            img = cv.imread(image, 0)
+            re_shape = cv.resize(img, (28, 28), interpolation=cv.INTER_CUBIC)
+
+            img_ = deskew(re_shape)
+            hog_ = hog(img_)
+            x.append(hog_)
+        pre_y = predict(test_x=x, clf=clf)
+        for i in range(len(pre_y)):
+            result = imgs[i] + '的预测结果为：' + id_2_label[pre_y[i]]
+            print(result)
+    else:
+        x = []
+        img = cv.imread(file_path, 0)
+        re_shape = cv.resize(img, (28, 28), interpolation=cv.INTER_CUBIC)
+
+        img_ = deskew(re_shape)
+        hog_ = hog(img_)
+        x.append(hog_)
+
+        clf_ = 'model.pkl'
+        with open(clf_, 'rb') as f:
+            clf = pickle.load(f)
+        pre_y = predict(test_x=x, clf=clf)
+        pre = id_2_label[pre_y[0]]
+        print('预测结果为：', pre)
 
 
 def main():
-    # file = 'test.png'
-    # person_detect(file=file)
+    # file = 'person_test'
+    # person_detect(file_path=file, bat=True)
     path = '../digit_data'
     train_x, train_y, test_x, test_y = set_data(root_path=path)
     clf = train(train_x=train_x, train_y=train_y)
