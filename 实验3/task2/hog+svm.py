@@ -90,7 +90,7 @@ def deskew(img):
 
 
 def train(train_x, train_y):
-    clf_ = 'model.pkl'
+    clf_ = 'model_svm.pkl'
     if os.path.exists(clf_):
         with open(clf_, 'rb') as f:
             clf = pickle.load(f)
@@ -143,13 +143,12 @@ def measure(test_y, pre_y):
 
 
 def person_detect(file_path, bat=False):
+    clf_ = 'model_svm.pkl'
+    with open(clf_, 'rb') as f:
+        clf = pickle.load(f)
+    x = []
     if bat:
         imgs = os.listdir(file_path)
-        x = []
-        clf_ = 'model.pkl'
-        with open(clf_, 'rb') as f:
-            clf = pickle.load(f)
-
         for file in imgs:
             image = file_path + '/' + file
             img = cv.imread(image, 0)
@@ -158,12 +157,8 @@ def person_detect(file_path, bat=False):
             img_ = deskew(re_shape)
             hog_ = hog(img_)
             x.append(hog_)
-        pre_y = predict(test_x=x, clf=clf)
-        for i in range(len(pre_y)):
-            result = imgs[i] + '的预测结果为：' + id_2_label[pre_y[i]]
-            print(result)
     else:
-        x = []
+        imgs = [file_path]
         img = cv.imread(file_path, 0)
         re_shape = cv.resize(img, (28, 28), interpolation=cv.INTER_CUBIC)
 
@@ -171,12 +166,10 @@ def person_detect(file_path, bat=False):
         hog_ = hog(img_)
         x.append(hog_)
 
-        clf_ = 'model.pkl'
-        with open(clf_, 'rb') as f:
-            clf = pickle.load(f)
-        pre_y = predict(test_x=x, clf=clf)
-        pre = id_2_label[pre_y[0]]
-        print('预测结果为：', pre)
+    pre_y = predict(test_x=x, clf=clf)
+    for i in range(len(pre_y)):
+        result = imgs[i] + '的预测结果为：' + id_2_label[pre_y[i]]
+        print(result)
 
 
 def main():
