@@ -1,13 +1,12 @@
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
 import numpy as np
 import cv2 as cv
 import os
 import pickle
 
+
 bin_n = 16  # Number of bins
 affine_flags = cv.WARP_INVERSE_MAP | cv.INTER_LINEAR
+
 
 label_2_id = {'0': 0, '1': 1, '2': 2, '3': 3, '4': 4,
               '5': 5, '6': 6, '7': 7, '8': 8, '9': 9}
@@ -89,21 +88,6 @@ def deskew(img):
     return img
 
 
-def train(train_x, train_y):
-    clf_ = 'model_svm.pkl'
-    if os.path.exists(clf_):
-        with open(clf_, 'rb') as f:
-            clf = pickle.load(f)
-        print('model loaded successfully!')
-    else:
-        clf = make_pipeline(StandardScaler(), SVC(gamma='auto'))
-        print('model built successfully')
-        clf.fit(train_x, train_y)
-        with open(clf_, 'wb') as f:
-            pickle.dump(clf, f)
-    return clf
-
-
 def predict(test_x, clf):
     return clf.predict(test_x)
 
@@ -142,12 +126,11 @@ def measure(test_y, pre_y):
     return acc, recall, precision, f1
 
 
-def person_detect(file_path, bat=False):
-    clf_ = 'model_svm.pkl'
+def detect(file_path, clf_, dir_=False):
     with open(clf_, 'rb') as f:
         clf = pickle.load(f)
     x = []
-    if bat:
+    if dir_:
         imgs = os.listdir(file_path)
         for file in imgs:
             image = file_path + '/' + file
@@ -171,17 +154,3 @@ def person_detect(file_path, bat=False):
         result = imgs[i] + '的预测结果为：' + id_2_label[pre_y[i]]
         print(result)
 
-
-def main():
-    # file = 'person_test'
-    # person_detect(file_path=file, bat=True)
-    path = '../digit_data'
-    train_x, train_y, test_x, test_y = set_data(root_path=path)
-    clf = train(train_x=train_x, train_y=train_y)
-    pre_y = predict(test_x=test_x, clf=clf)
-    acc, recall, pre, f1 = measure(test_y=test_y, pre_y=pre_y)
-    print('accuracy: {0}\nrecall: {1}\nprecision: {2}\nf1 measure: {3}'.format(acc, recall, pre, f1))
-
-
-if __name__ == '__main__':
-    main()
