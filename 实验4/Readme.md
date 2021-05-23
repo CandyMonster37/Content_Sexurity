@@ -40,5 +40,12 @@ pip install soundfile
 
 详细的东西看实验报告`Content_Sexurity/src/实验4.pdf`。
 
-我是在Ubuntu 18.04上进行的。
+我是在Ubuntu 18.04.5 LTS上操作的，用的软件源是Ubuntu在中国的服务器。
+
+同时推荐几篇相关的博客，有兴趣的话（遇到什么问题的话）可以看看：
+
+1. [Kaldi入门：yes/no项目](https://www.jianshu.com/p/09deba57f339)
+2. [语音识别:模型文件介绍之FST(Kaldi)](https://zhuanlan.zhihu.com/p/74829828)
+3. [Kaldi中FST的可视化-以yes/no为例](https://blog.csdn.net/u013677156/article/details/77893661)
+4. [Kaldi教程（一）](http://fancyerii.github.io/kaldidoc/tutorial1/)
 
