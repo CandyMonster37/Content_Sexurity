@@ -17,6 +17,8 @@
 
 任务2还是得自己搭，可以照着这个网站的步骤来：[KALDI部署步骤](https://zhuanlan.zhihu.com/p/44483840)
 
+TIMIT的数据集需要自己在网上下载！
+
 ## **task1 提取chew.wav的MFCC特征**
 
 这是task1。
@@ -45,7 +47,17 @@ pip install soundfile
 同时推荐几篇相关的博客，有兴趣的话（遇到什么问题的话）可以看看：
 
 1. [Kaldi入门：yes/no项目](https://www.jianshu.com/p/09deba57f339)
-2. [语音识别:模型文件介绍之FST(Kaldi)](https://zhuanlan.zhihu.com/p/74829828)
-3. [Kaldi中FST的可视化-以yes/no为例](https://blog.csdn.net/u013677156/article/details/77893661)
-4. [Kaldi教程（一）](http://fancyerii.github.io/kaldidoc/tutorial1/)
+2. [Kaldi-TIMIT项目各目录/脚本讲解](https://www.jianshu.com/p/5978380c3f82)
+3. [Kaldi-TIMIT项目可能出现的报错信息及解决措施](https://blog.csdn.net/luckygirl0809/article/details/79094447)
+4. [timit实例的运行前配置及运行时报错的应对措施](https://blog.csdn.net/qq_25750561/article/details/78785418)
+5. [Kaldi 和 TIMIT 入门](https://blog.csdn.net/weixin_40472289/article/details/100511088)
+6. [语音识别:模型文件介绍之FST(Kaldi)](https://zhuanlan.zhihu.com/p/74829828)
+7. [Kaldi中FST的可视化-以yes/no为例](https://blog.csdn.net/u013677156/article/details/77893661)
+8. [kaldi的语音识别数据timit例子详解](https://blog.csdn.net/danyhgc/article/details/75222517)（好多东西其他博客讲过了，主要是最底部有命令可以查看解码信息）
+9. [Kaldi教程（一）](http://fancyerii.github.io/kaldidoc/tutorial1/)
+10. [Kaldi声学模型训练](https://blog.csdn.net/shichaog/article/details/78441304)
+11. [说话人识别中训练通用背景模型(UBM)的研究](https://blog.csdn.net/xixirupan/article/details/82142874)
+12. [子空间高斯混合模型-SGMM](https://blog.csdn.net/quhediegooo/article/details/68946100)
+13. [声学模型学习笔记（五） SDT(MMI/BMMI/MPE/sMBR)](https://blog.csdn.net/xmdxcsj/article/details/52760111)
+14. [语音识别学习记录 -Kaldi的3中nnets](https://blog.csdn.net/u013569304/article/details/81288843)
 
