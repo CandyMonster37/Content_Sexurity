@@ -4,31 +4,41 @@ import numpy as np
 import pandas as pd
 
 
-def getAUC(y_true, y_score):
-    auc = 0
-    zero = np.zeros_like(y_true)
-    one = np.ones_like(y_true)
-    for i in range(y_score.shape[1]):
-        y_true_binary = np.where(y_true == i, one, zero)
-        y_score_binary = y_score[:, i]
-        auc += roc_auc_score(y_true_binary, y_score_binary)
-    return auc / y_score.shape[1]
+def getAUC(y_true, y_score, num_class=2):
+    if num_class == 2:
+        y_score = y_score[:, -1]
+        return roc_auc_score(y_true, y_score)
+    else:
+        auc = 0
+        zero = np.zeros_like(y_true)
+        one = np.ones_like(y_true)
+        for i in range(y_score.shape[1]):
+            y_true_binary = np.where(y_true == i, one, zero)
+            y_score_binary = y_score[:, i]
+            auc += roc_auc_score(y_true_binary, y_score_binary)
+        return auc / y_score.shape[1]
 
 
-def getACC(y_true, y_score, threshold=0.5):
-    y_pred = np.zeros_like(y_true)
-    for i in range(y_score.shape[0]):
-        y_pred[i] = np.argmax(y_score[i])
-    return accuracy_score(y_true, y_pred)
+def getACC(y_true, y_score, threshold=0.5, num_class=2):
+    if num_class == 2:
+        y_pred = np.zeros_like(y_true)
+        for i in range(y_score.shape[0]):
+            y_pred[i] = (y_score[i][-1] > threshold)
+        return accuracy_score(y_true, y_pred)
+    else:
+        y_pred = np.zeros_like(y_true)
+        for i in range(y_score.shape[0]):
+            y_pred[i] = np.argmax(y_score[i])
+        return accuracy_score(y_true, y_pred)
 
 
 def save_results(y_true, y_score, outputpath):
     idx = []
     idx.append('id')
 
-    for i in range(y_true.shape[1]):
+    for i in range(y_true.shape[0]):
         idx.append('true_%s' % i)
-    for i in range(y_score.shape[1]):
+    for i in range(y_score.shape[0]):
         idx.append('score_%s' % i)
 
     df = pd.DataFrame(columns=idx)

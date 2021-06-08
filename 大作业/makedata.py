@@ -21,9 +21,9 @@ def prepare_data(in_dir='./data', out_dir='./dataset', batch_size=128):
         path = os.path.join(in_dir, label)
         files = os.listdir(path)
         filenums += len(files)
-        s1_ = round(0.6 * len(files))
+        s1_ = round(0.8 * len(files))
         s1 += s1_
-        s2_ = round(0.2 * len(files))
+        s2_ = round(0.1 * len(files))
         s2 += s2_
         s2_ += s1_
 
@@ -70,8 +70,8 @@ def prepare_data(in_dir='./data', out_dir='./dataset', batch_size=128):
 
 def make_data_loader(root_dir='./dataset', batch_size=128):
     mode = ['train', 'test', 'dev']
-    h = 120
-    w = 160
+    h = 56
+    w = 56
     # 设置训练集
     train_transform = transforms.Compose([
         transforms.RandomResizedCrop([h, w]),  # 重置分辨率为w * h大小
@@ -129,5 +129,5 @@ def get_data_loader(in_dir='./data', out_dir='./dataset', batch_size=128):
 
 
 if __name__ == '__main__':
-    prepare_data(in_dir='./data', out_dir='./dataset', batch_size=128)
+    prepare_data(in_dir='./data', out_dir='./dataset', batch_size=4)
 
