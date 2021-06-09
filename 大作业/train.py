@@ -124,8 +124,8 @@ def detect(in_dir, model_dir, num_class=2):
         files.append(in_dir)
 
     to_check_transform = transforms.Compose([
-        transforms.Resize([h, w]),  # resize到w * h大小
-        transforms.ToTensor(),  # 转化成Tensor
+        transforms.Resize([h, w]),
+        transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
 
@@ -134,25 +134,20 @@ def detect(in_dir, model_dir, num_class=2):
         img = Image.open(img_file).convert('RGB')
         img = to_check_transform(img)
         img = img.unsqueeze(0)
-        ans = predict(img, model, device)
+        with torch.no_grad():
+            img = img.to(device)
+            out = model(img)
+            _, pre = torch.max(out.data, 1)
+        ans = pre.item()
         if ans == 0:
             print('Image \'{0}\' is considered no problem.'.format(files[i]))
         elif ans == 1:
-            print('Image \'{0}\' may contain illegal content.'.format(files[i]))
+            print('Warning! Image \'{0}\' may contain illegal content.'.format(files[i]))
         else:
-            print('Image \'{0}\' contains illegal content!'.format(files[i]))
+            print('FBI WARNING! Image \'{0}\' contains illegal content!'.format(files[i]))
         # print('{0} is recognized as class {1}'.format(files[i], int(ans)))
     path = os.path.abspath('./to_check')
     tmp = os.popen('rmdir /s/q {0}'.format(path))
-
-
-def predict(input, model, device):
-    model.to(device)
-    with torch.no_grad():
-        input = input.to(device)
-        out = model(input)
-        _, pre = torch.max(out.data, 1)
-        return pre.item()
 
 
 def show_res_imgs(end_epoch, train, test, dev, y_name, img_dir):
@@ -173,7 +168,7 @@ def show_res_imgs(end_epoch, train, test, dev, y_name, img_dir):
     plt.ylabel(y_name)
     plt.legend()
 
-    lim = int(end_epoch / 5) * end_epoch + 5
+    lim = int(end_epoch / 5) * 5 + 5
     x_ticks = np.linspace(0, lim, 5)
     plt.xticks(x_ticks)
     y_ticks = np.arange(0, 1, 0.05)
@@ -211,7 +206,7 @@ def train_and_test(in_dir, loader_dir, output_root, lr=0.001, end_epoch=100, bat
     optimizer = optim.Adam(model.parameters(), lr=lr)  # 设置优化器和学习率
 
     for epoch in trange(start_epoch, end_epoch):
-        print('\n')
+        # print('\n')
         train(model, optimizer, loss_function, train_loader, device)
         val(model, test_loader, device, val_auc_list, output_root, epoch, num_class=num_class)
         test(model, train_loader, device, auc_list=train_auc_list, acc_list=train_acc_list,
@@ -249,28 +244,31 @@ def train_and_test(in_dir, loader_dir, output_root, lr=0.001, end_epoch=100, bat
 
 
 if __name__ == '__main__':
-    num_class = 4
-    in_dir = './data_' + str(num_class)
-    output_root = './ckpt_' + str(num_class)
-    loader_dir = './dataset_' + str(num_class)
-
     end_epoch = 100
     batch_size = 8
     lr = 0.001
-    train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
-         end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
-    path = os.path.abspath(loader_dir)
-    tmp = os.popen('rmdir /s/q {0}'.format(path))
+
+    # num_class = 4
+    # in_dir = './data_' + str(num_class)
+    # output_root = './ckpt_' + str(num_class)
+    # loader_dir = './dataset_' + str(num_class)
+    #
+    # train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
+    #                end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
+    # path = os.path.abspath(loader_dir)
+    # tmp = os.popen('rmdir /s/q {0}'.format(path))
 
     num_class = 2
     in_dir = './data_' + str(num_class)
     output_root = './ckpt_' + str(num_class)
     loader_dir = './dataset_' + str(num_class)
+
     train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
-         end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
+                   end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
     path = os.path.abspath(loader_dir)
     dele = os.popen('rmdir /s/q {0}'.format(path))
 
+    # num_class = 4
     # in_dir = './tocheck'
-    # model_dir = './ckpt_4_yes'
-    # detect(in_dir, model_dir, num_class=4)
+    # model_dir = './ckpt_{}'.format(str(num_class))
+    # detect(in_dir, model_dir, num_class=num_class)
