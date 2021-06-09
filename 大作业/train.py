@@ -135,7 +135,13 @@ def detect(in_dir, model_dir, num_class=2):
         img = to_check_transform(img)
         img = img.unsqueeze(0)
         ans = predict(img, model, device)
-        print('{0} is recognized as class {1}'.format(files[i], int(ans)))
+        if ans == 0:
+            print('Image \'{0}\' is considered no problem.'.format(files[i]))
+        elif ans == 1:
+            print('Image \'{0}\' may contain illegal content.'.format(files[i]))
+        else:
+            print('Image \'{0}\' contains illegal content!'.format(files[i]))
+        # print('{0} is recognized as class {1}'.format(files[i], int(ans)))
     path = os.path.abspath('./to_check')
     tmp = os.popen('rmdir /s/q {0}'.format(path))
 
