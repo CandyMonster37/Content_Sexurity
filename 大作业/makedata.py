@@ -27,7 +27,7 @@ def prepare_data(in_dir='./data', out_dir='./dataset', batch_size=128):
         s2 += s2_
         s2_ += s1_
 
-        #  训练集 : 测试集 : 验证集 = 6 : 2 : 2
+        #  训练集 : 测试集 : 验证集 = 8 : 1 : 1
         tar = os.path.join(out_dir, splited[0])
         tar = os.path.join(tar, label)
         tar = os.path.abspath(tar)

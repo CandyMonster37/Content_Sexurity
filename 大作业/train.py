@@ -14,6 +14,7 @@ from PIL import Image
 
 
 def train(model, optimizer, loss_function, train_loader, device):
+    loss_list = []
     model.train()
     for batch_idx, (inputs, targets) in enumerate(train_loader):
         optimizer.zero_grad()
@@ -22,8 +23,12 @@ def train(model, optimizer, loss_function, train_loader, device):
         targets = targets.squeeze().long().to(device)
         loss = loss_function(outputs, targets)
 
+        loss_list.append(loss.item())
+
         loss.backward()
         optimizer.step()
+    ave_loss = sum(loss_list) / len(loss_list)
+    return round(ave_loss, 5)
 
 
 def val(model, val_loader, device, val_auc_list, dir_path, epoch, num_class=2):
@@ -150,6 +155,24 @@ def detect(in_dir, model_dir, num_class=2):
     tmp = os.popen('rmdir /s/q {0}'.format(path))
 
 
+def show_loss_imgs(end_epoch, loss_list, img_dir):
+    x_axis = []
+    for i in range(end_epoch):
+        x_axis.append(i + 1)
+    plt.figure(figsize=(10.8, 7.2), dpi=100)
+    plt.title('epochs = {0}'.format(str(end_epoch)))
+    plt.xlabel('epoch')
+    plt.ylabel('train loss')
+    plt.plot(x_axis, loss_list)
+    lim = int(end_epoch / 5) * 5 + 5
+    x_ticks = np.linspace(0, lim, 5)
+    plt.xticks(x_ticks)
+    y_ticks = np.arange(0, 1, 0.05)
+    plt.yticks(y_ticks)
+    plt.savefig(img_dir)
+    plt.show()
+
+
 def show_res_imgs(end_epoch, train, test, dev, y_name, img_dir):
     x_axis = []
     for i in range(end_epoch):
@@ -204,10 +227,12 @@ def train_and_test(in_dir, loader_dir, output_root, lr=0.001, end_epoch=100, bat
     model = ResNet50(in_channels=3, num_classes=num_class).to(device)
     loss_function = nn.CrossEntropyLoss()  # 设置损失函数
     optimizer = optim.Adam(model.parameters(), lr=lr)  # 设置优化器和学习率
+    loss_list = []
 
     for epoch in trange(start_epoch, end_epoch):
         # print('\n')
-        train(model, optimizer, loss_function, train_loader, device)
+        loss = train(model, optimizer, loss_function, train_loader, device)
+        loss_list.append(loss)
         val(model, test_loader, device, val_auc_list, output_root, epoch, num_class=num_class)
         test(model, train_loader, device, auc_list=train_auc_list, acc_list=train_acc_list,
              mode='train', num_class=num_class)
@@ -221,7 +246,9 @@ def train_and_test(in_dir, loader_dir, output_root, lr=0.001, end_epoch=100, bat
 
     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     print('Finish at: ', now)
-    print('epoch {0} is the best model'.format(index))
+    print('epoch {0} is the best model with auc: {1} and acc: {2}'
+          .format(index, round(test_auc_list[index], 5), round(test_acc_list[index], 5)))
+    show_loss_imgs(end_epoch=end_epoch, loss_list=loss_list, img_dir='./train_loss.png')
 
     print('==> Testing model...')
     value = auc_list[index]
@@ -231,7 +258,12 @@ def train_and_test(in_dir, loader_dir, output_root, lr=0.001, end_epoch=100, bat
     models = os.listdir(output_root)
     for item in models:
         if item == tar_res:
-            continue
+            to_re = os.path.join(output_root, item)
+            to_re = os.path.abspath(to_re)
+            value2 = test_acc_list[index]
+            value2 = round(value2, 5)
+            new_name = 'ckpt_{0}_auc_{1}_acc_{2}.pth'.format(index, value, value2)
+            tmp = os.popen('ren {0} {1}'.format(to_re, new_name))
         else:
             to_del = os.path.join(output_root, item)
             to_del = os.path.abspath(to_del)
@@ -248,7 +280,18 @@ if __name__ == '__main__':
     batch_size = 8
     lr = 0.001
 
-    # num_class = 4
+    num_class = 22
+    in_dir = './data_' + str(num_class)
+    output_root = './ckpt_' + str(num_class)
+    loader_dir = './dataset_' + str(num_class)
+    num_class = 2
+
+    train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
+                   end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
+    path = os.path.abspath(loader_dir)
+    tmp = os.popen('rmdir /s/q {0}'.format(path))
+
+    # num_class = 2
     # in_dir = './data_' + str(num_class)
     # output_root = './ckpt_' + str(num_class)
     # loader_dir = './dataset_' + str(num_class)
@@ -256,17 +299,7 @@ if __name__ == '__main__':
     # train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
     #                end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
     # path = os.path.abspath(loader_dir)
-    # tmp = os.popen('rmdir /s/q {0}'.format(path))
-
-    num_class = 2
-    in_dir = './data_' + str(num_class)
-    output_root = './ckpt_' + str(num_class)
-    loader_dir = './dataset_' + str(num_class)
-
-    train_and_test(in_dir=in_dir, loader_dir=loader_dir, output_root=output_root,
-                   end_epoch=end_epoch, batch_size=batch_size, lr=lr, num_class=num_class)
-    path = os.path.abspath(loader_dir)
-    dele = os.popen('rmdir /s/q {0}'.format(path))
+    # dele = os.popen('rmdir /s/q {0}'.format(path))
 
     # num_class = 4
     # in_dir = './tocheck'
